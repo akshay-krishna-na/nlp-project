@@ -12,6 +12,7 @@ from sklearn.svm import LinearSVC
 from sklearn.metrics import classification_report
 from transformers import BertTokenizer, BertForSequenceClassification
 import torch
+import numpy as np
 
 
 
@@ -116,6 +117,68 @@ train_texts, test_texts, train_labels, test_labels = train_test_split(
 
 train_encodings = tokenizer(list(train_texts), truncation=True, padding=True, max_length=128)
 test_encodings = tokenizer(list(test_texts), truncation=True, padding=True, max_length=128)
+train_labels_tensor = torch.tensor(train_labels, dtype=torch.float32)
+test_labels_tensor = torch.tensor(test_labels, dtype=torch.float32) 
+train_dataset = torch.utils.data.TensorDataset(
+    torch.tensor(train_encodings['input_ids']),
+    torch.tensor(train_encodings['attention_mask']),
+    train_labels_tensor
+)
+test_dataset = torch.utils.data.TensorDataset(
+    torch.tensor(test_encodings['input_ids']),
+    torch.tensor(test_encodings['attention_mask']),
+    test_labels_tensor
+)       
+train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=16, shuffle=True)
+test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=16, shuffle=False)
+# Training the BERT model
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')   
+model.to(device)
+optimizer = torch.optim.AdamW(model.parameters(), lr=5e-5)          
+num_epochs = 3
+for epoch in range(num_epochs):
+    model.train()
+    for batch in train_loader:
+        input_ids, attention_mask, labels = [b.to(device) for b in batch]
+        optimizer.zero_grad()
+        outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
+        loss = outputs.loss
+        loss.backward()
+        optimizer.step()
+    print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {loss.item()}")
+
+# Evaluating the BERT model
+model.eval()                
+predictions = []    
+for batch in test_loader:
+    input_ids, attention_mask, _ = [b.to(device) for b in batch]
+    with torch.no_grad():
+        outputs = model(input_ids, attention_mask=attention_mask)
+    logits = outputs.logits
+    predictions.append(logits.sigmoid().cpu().numpy())
+predictions = np.vstack(predictions)
+
+y_pred_bert = (predictions > 0.5).astype(int)
+print(classification_report(test_labels, y_pred_bert, target_names=label_columns))
+# Testing my own query with BERT    
+print("Enter your query to test the BERT model:")
+input_query_bert = input()
+
+
+
+test_query_bert = preprocess_bert(input_query_bert)
+test_encoding_bert = tokenizer(test_query_bert, return_tensors='pt', truncation=True, padding=True, max_length=128).to(device)
+with torch.no_grad():
+    outputs = model(**test_encoding_bert)
+    logits = outputs.logits
+    test_prediction_bert = (logits.sigmoid().cpu().numpy() > 0.5).astype(int)
+
+print(f"BERT Prediction for '{input_query_bert}': {dict(zip(label_columns, test_prediction_bert[0]))}")
+
+
+
 
 print("Training BERT model...")
+
+
 
