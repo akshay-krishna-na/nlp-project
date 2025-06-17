@@ -135,6 +135,7 @@ test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=16, shuffle=F
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')   
 model.to(device)
 optimizer = torch.optim.AdamW(model.parameters(), lr=5e-5)          
+print("Training BERT model...")
 num_epochs = 3
 for epoch in range(num_epochs):
     model.train()
@@ -178,7 +179,6 @@ print(f"BERT Prediction for '{input_query_bert}': {dict(zip(label_columns, test_
 
 
 
-print("Training BERT model...")
 
 
 
