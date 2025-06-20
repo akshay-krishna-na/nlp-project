@@ -13,6 +13,7 @@ from sklearn.metrics import classification_report
 from transformers import BertTokenizer, BertForSequenceClassification
 import torch
 import numpy as np
+import joblib
 
 
 
@@ -78,6 +79,11 @@ test_query_svm = preprocess_svm(input_query)
 test_vector_svm = vectorizer.transform([test_query_svm])        
 test_prediction_svm = svm_model.predict(test_vector_svm)
 print(f"SVM Prediction for '{input_query}': {dict(zip(y.columns, test_prediction_svm[0]))}")
+
+
+#model export
+joblib.dump(svm_model, "svm_model.pkl")
+joblib.dump(vectorizer, "svm_vectorizer.pkl")
 
 #----------------SVM end----------------
 
@@ -176,7 +182,9 @@ with torch.no_grad():
 
 print(f"BERT Prediction for '{input_query_bert}': {dict(zip(label_columns, test_prediction_bert[0]))}")
 
-
+#BERT model export
+model.save_pretrained("saved_bert_model")
+tokenizer.save_pretrained("saved_bert_model")
 
 
 
