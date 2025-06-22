@@ -33,5 +33,5 @@ def predict_bert(text):
 text = input("Enter you text for analysis :")
 
 
-print("Analysis result with SVM model : ")
+print("Analysis result with BERT model : ")
 print(predict_bert(text))

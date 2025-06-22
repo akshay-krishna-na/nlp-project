@@ -1,0 +1,10 @@
+!!!Run pip install using requirements.txt to collect all required packages before running main and trainer scripts!!!!
+
+Trainer is the code for training the models based on both SVM and BERT. 
+
+Trained models are saved on a separate folder in save directory.
+
+Main.py invokes the models to do the prediction on track file containing the test data and returns a array with a subset of emotions implied in each row of track csv file represented by either '1' to denote presence of emotion and '0' to denote absence.
+
+Going to try distilBERT to cut down the size of trained model since it's exceeding permitted upload size of 200MB in ILIAS
+
