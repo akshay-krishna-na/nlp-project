@@ -1,6 +1,8 @@
 import pandas as pd
 import torch
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import f1_score, precision_score, recall_score, accuracy_score
+
 from transformers import DistilBertTokenizerFast, DistilBertForSequenceClassification, Trainer, TrainingArguments
 from datasets import Dataset
 import numpy as np
@@ -53,10 +55,18 @@ training_args = TrainingArguments(
 # Metrics
 
 
+
 def compute_metrics(p):
     preds = torch.sigmoid(torch.tensor(p.predictions)).numpy() > 0.5
     labels = p.label_ids
-    return {"f1": f1_score(labels, preds, average="micro")}
+
+    return {
+        "f1_micro": f1_score(labels, preds, average="micro"),
+        "f1_macro": f1_score(labels, preds, average="macro"),
+        "precision_micro": precision_score(labels, preds, average="micro", zero_division=0),
+        "recall_micro": recall_score(labels, preds, average="micro", zero_division=0),
+        "accuracy": accuracy_score(labels, preds),
+    }
 
 # Trainer
 trainer = Trainer(

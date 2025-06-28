@@ -3,7 +3,7 @@ import torch
 import numpy as np
 
 # Load model and tokenizer
-model_path=r"C:\Users\akshay\OneDrive\Desktop\nlp-project\trained_models\saved_bert_model" #replace accordingly with model directory
+model_path=r"C:\Users\aksha\Documents\NLP project\trained_models\saved_bert_model" #replace accordingly with model directory
 model = BertForSequenceClassification.from_pretrained(model_path)
 tokenizer = BertTokenizer.from_pretrained(model_path)
 

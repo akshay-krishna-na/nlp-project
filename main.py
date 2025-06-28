@@ -5,7 +5,7 @@ import re
 from transformers import BertTokenizer, BertForSequenceClassification
 
 # Load our saved model and tokenizer for bert
-model_path = r"C:\Users\aksha\Documents\NLP project\saved_bert_model"  
+model_path = r"C:\Users\aksha\Documents\NLP project\trained_models\saved_bert_model"  
 model = BertForSequenceClassification.from_pretrained(model_path)
 tokenizer = BertTokenizer.from_pretrained(model_path)
 
